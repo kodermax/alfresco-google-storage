@@ -58,4 +58,8 @@ public class StorageContentStore extends AbstractContentStore
         this.rootDirectory = dir;
     }
 
+    public void init() {
+
+    }
+
 }
