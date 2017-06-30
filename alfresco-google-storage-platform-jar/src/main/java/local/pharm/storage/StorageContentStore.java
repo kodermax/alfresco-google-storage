@@ -14,6 +14,10 @@ import org.apache.commons.logging.LogFactory;
 public class StorageContentStore extends AbstractContentStore
         implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
 
+    private String projectId;
+    private String bucketName;
+    private String rootDirectory;
+
     private static final Log logger = LogFactory.getLog(StorageContentStore.class);
 
     @Override
@@ -35,4 +39,23 @@ public class StorageContentStore extends AbstractContentStore
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
 
     }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    public void setRootDirectory(String rootDirectory) {
+
+        String dir = rootDirectory;
+        if (dir.startsWith("/")) {
+            dir = dir.substring(1);
+        }
+
+        this.rootDirectory = dir;
+    }
+
 }

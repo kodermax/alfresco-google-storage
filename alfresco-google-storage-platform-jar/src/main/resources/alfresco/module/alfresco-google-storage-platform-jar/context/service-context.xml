@@ -20,6 +20,78 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+    <!--  Caching Content Store -->
+    <bean id="fileContentStore" class="org.alfresco.repo.content.caching.CachingContentStore" init-method="init">
+        <property name="backingStore" ref="local.pharm.storage.StorageContentStore"/>
+        <property name="cache" ref="contentCache"/>
+        <property name="cacheOnInbound" value="${system.content.caching.cacheOnInbound}"/>
+        <property name="quota" ref="standardQuotaManager"/>
+    </bean>
+    <!-- Delete content Store -->
+    <bean id="deletedContentStore" class="local.pharm.storage.StorageContentStore" init-method="init">
+        <property name="projectId" value="${google.projectId}"/>
+        <property name="bucketName" value="${google.bucketName}"/>
+        <property name="rootDirectory" value="${dir.contentstore.deleted}"/>
+    </bean>
+
+    <bean id="contentCache" class="org.alfresco.repo.content.caching.ContentCacheImpl">
+        <property name="memoryStore" ref="cachingContentStoreCache"/>
+        <property name="cacheRoot" value="${dir.cachedcontent}"/>
+    </bean>
+
+    <bean id="cachingContentStoreCache" factory-bean="cacheFactory" factory-method="createCache">
+        <constructor-arg value="cache.cachingContentStoreCache"/>
+    </bean>
+    <bean id="standardQuotaManager"
+          class="org.alfresco.repo.content.caching.quota.StandardQuotaStrategy"
+          init-method="init"
+          destroy-method="shutdown">
+        <property name="maxUsageMB" value="4096"/>
+        <property name="maxFileSizeMB" value="0"/>
+        <property name="cache" ref="contentCache"/>
+        <property name="cleaner" ref="cachedContentCleaner"/>
+    </bean>
+
+    <bean id="cachingContentStoreCleanerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass">
+            <value>org.alfresco.repo.content.caching.cleanup.CachedContentCleanupJob</value>
+        </property>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="cachedContentCleaner">
+                    <ref bean="cachedContentCleaner" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="cachedContentCleaner"
+          class="org.alfresco.repo.content.caching.cleanup.CachedContentCleaner"
+          init-method="init">
+        <property name="minFileAgeMillis" value="${system.content.caching.minFileAgeMillis}"/>
+        <property name="maxDeleteWatchCount" value="${system.content.caching.maxDeleteWatchCount}"/>
+        <property name="cache" ref="contentCache"/>
+        <property name="usageTracker" ref="standardQuotaManager"/>
+    </bean>
+    <bean id="cachingContentStoreCleanerTrigger" class="org.alfresco.util.CronTriggerBean">
+        <property name="jobDetail">
+            <ref bean="cachingContentStoreCleanerJobDetail" />
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="cronExpression">
+            <value>${system.content.caching.contentCleanup.cronExpression}</value>
+        </property>
+    </bean>
+
+    <bean id="local.pharm.storage.StorageContentStore" class="local.pharm.storage.StorageContentStore" init-method="init">
+        <property name="projectId" value="${google.projectId}"/>
+        <property name="bucketName" value="${google.bucketName}"/>
+        <property name="rootDirectory" value="${dir.contentstore}"/>
+    </bean>
+
+
     <!-- A simple class that is initialized by Spring -->
     <bean id="local.pharm.Demo" class="local.pharm.platformsample.Demo" init-method="init" />
 
