@@ -26,18 +26,15 @@
         <property name="cacheOnInbound" value="${system.content.caching.cacheOnInbound}"/>
         <property name="quota" ref="standardQuotaManager"/>
     </bean>
-    <!-- Delete content Store -->
-    <bean id="deletedContentStore" class="local.pharm.storage.StorageContentStore" init-method="init">
+    <bean id="local.pharm.storage.StorageContentStore" class="local.pharm.storage.StorageContentStore" init-method="init">
         <property name="projectId" value="${google.projectId}"/>
         <property name="bucketName" value="${google.bucketName}"/>
-        <property name="rootDirectory" value="${dir.contentstore.deleted}"/>
+        <property name="rootDirectory" value="${dir.contentstore}"/>
     </bean>
-
     <bean id="contentCache" class="org.alfresco.repo.content.caching.ContentCacheImpl">
         <property name="memoryStore" ref="cachingContentStoreCache"/>
         <property name="cacheRoot" value="${dir.cachedcontent}"/>
     </bean>
-
     <bean id="cachingContentStoreCache" factory-bean="cacheFactory" factory-method="createCache">
         <constructor-arg value="cache.cachingContentStoreCache"/>
     </bean>
@@ -50,7 +47,6 @@
         <property name="cache" ref="contentCache"/>
         <property name="cleaner" ref="cachedContentCleaner"/>
     </bean>
-
     <bean id="cachingContentStoreCleanerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass">
             <value>org.alfresco.repo.content.caching.cleanup.CachedContentCleanupJob</value>
@@ -72,6 +68,7 @@
         <property name="cache" ref="contentCache"/>
         <property name="usageTracker" ref="standardQuotaManager"/>
     </bean>
+
     <bean id="cachingContentStoreCleanerTrigger" class="org.alfresco.util.CronTriggerBean">
         <property name="jobDetail">
             <ref bean="cachingContentStoreCleanerJobDetail" />
@@ -84,11 +81,7 @@
         </property>
     </bean>
 
-    <bean id="local.pharm.storage.StorageContentStore" class="local.pharm.storage.StorageContentStore" init-method="init">
-        <property name="projectId" value="${google.projectId}"/>
-        <property name="bucketName" value="${google.bucketName}"/>
-        <property name="rootDirectory" value="${dir.contentstore}"/>
-    </bean>
+
 
 
     <!-- A simple class that is initialized by Spring -->
