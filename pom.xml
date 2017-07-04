@@ -7,7 +7,6 @@
     <name>AIO - SDK 3.0</name>
     <description>All-In-One (AIO) project for SDK 3.0</description>
     <packaging>pom</packaging>
-
     <properties>
         <!-- Alfresco Maven Plugin version to use -->
         <alfresco.sdk.version>3.0.2-SNAPSHOT</alfresco.sdk.version>
@@ -76,7 +75,6 @@
             <version>4.5.2</version>
             <scope>test</scope>
         </dependency>
-
         <!-- The main Alfresco Repo dependency for compiling Java code in src/main/java -->
         <dependency>
             <groupId>${alfresco.groupId}</groupId>
@@ -303,6 +301,12 @@
                             <version>${alfresco.share.version}</version>
                             <type>amp</type>
                         </moduleDependency>
+                        <moduleDependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>alfresco-google-storage-adapter-amp</artifactId>
+                            <version>${project.version}</version>
+                            <type>amp</type>
+                        </moduleDependency>
 
                         <!-- Bring in custom Modules -->
                         <moduleDependency>
@@ -310,15 +314,15 @@
                             <artifactId>alfresco-google-storage-platform-jar</artifactId>
                             <version>${project.version}</version>
                         </moduleDependency>
-
                         <!-- Bring in the integration tests -->
+                        <!--
                         <moduleDependency>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>integration-tests</artifactId>
                             <version>${project.version}</version>
                             <classifier>tests</classifier>
                         </moduleDependency>
-
+                        -->
                     </platformModules>
 
                     <!--
@@ -412,6 +416,6 @@
   <modules>
     <module>alfresco-google-storage-platform-jar</module>
     <module>alfresco-google-storage-share-jar</module>
-    <module>integration-tests</module>
+    <module>alfresco-google-storage-adapter-amp</module>
   </modules>
 </project>
