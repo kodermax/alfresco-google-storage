@@ -19,19 +19,17 @@
 <beans>
     <!--  Caching Content Store -->
     <bean id="fileContentStore" class="org.alfresco.repo.content.caching.CachingContentStore" init-method="init">
-        <property name="backingStore" ref="local.pharm.storage.S3ContentStore"/>
+        <property name="backingStore" ref="local.pharm.storage.GSContentStore"/>
         <property name="cache" ref="contentCache"/>
         <property name="cacheOnInbound" value="${system.content.caching.cacheOnInbound}"/>
         <property name="quota" ref="standardQuotaManager"/>
     </bean>
 
     <!-- Delete content Store -->
-    <bean id="deletedContentStore" class="local.pharm.storage.S3ContentStore" init-method="init">
-        <property name="accessKey" value="${google.accessKey}"/>
-        <property name="projectId" value="${google.projectId}"/>
-        <property name="bucketName" value="${google.storage.bucketName}"/>
-        <property name="secretKey" value="${aws.secretKey}"/>
-        <property name="regionName" value="${aws.regionName}"/>
+    <bean id="deletedContentStore" class="local.pharm.storage.GSContentStore" init-method="init">
+        <property name="accessKey" value="${gcloud.accessKey}"/>
+        <property name="projectId" value="${gcloud.projectId}"/>
+        <property name="bucketName" value="${gcloud.storage.bucketName}"/>
         <property name="rootDirectory" value="${dir.contentstore.deleted}"/>
     </bean>
 
@@ -88,13 +86,10 @@
         </property>
     </bean>
 
-    <bean id="local.pharm.storage.S3ContentStore" class="local.pharm.storage.S3ContentStore" init-method="init">
-        <property name="accessKey" value="${google.accessKey}"/>
-        <property name="projectId" value="${google.projectId}"/>
-        <property name="bucketName" value="${google.storage.bucketName}"/>
-        <property name="secretKey" value="${aws.secretKey}"/>
-        <property name="bucketName" value="${aws.s3.bucketName}"/>
-        <property name="regionName" value="${aws.regionName}"/>
+    <bean id="local.pharm.storage.GSContentStore" class="local.pharm.storage.GSContentStore" init-method="init">
+        <property name="accessKey" value="${gcloud.accessKey}"/>
+        <property name="projectId" value="${gcloud.projectId}"/>
+        <property name="bucketName" value="${gcloud.storage.bucketName}"/>
         <property name="rootDirectory" value="${dir.contentstore}"/>
     </bean>
     <!-- A simple class that is initialized by Spring -->

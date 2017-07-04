@@ -73,6 +73,12 @@
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud</artifactId>
             <version>0.20.1-alpha</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>com.google</artifactId>
+                    <groupId>guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

@@ -16,9 +16,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
 
-public class S3ContentWriter extends AbstractContentWriter {
+public class GSContentWriter extends AbstractContentWriter {
 
-    private static final Log logger = LogFactory.getLog(S3ContentWriter.class);
+    private static final Log logger = LogFactory.getLog(GSContentWriter.class);
 
     private Storage storage;
     private String key;
@@ -26,17 +26,17 @@ public class S3ContentWriter extends AbstractContentWriter {
     private File tempFile;
     private long size;
 
-    public S3ContentWriter(String bucketName, String key, String contentUrl, ContentReader existingContentReader, Storage storage) {
+    public GSContentWriter(String bucketName, String key, String contentUrl, ContentReader existingContentReader, Storage storage) {
         super(contentUrl, existingContentReader);
         this.key = key;
         this.storage = storage;
         this.bucketName = bucketName;
-        addListener(new S3StreamListener(this));
+        addListener(new GSStreamListener(this));
     }
 
     @Override
     protected ContentReader createReader() throws ContentIOException {
-        return new S3ContentReader(key, getContentUrl(), storage, bucketName);
+        return new GSContentReader(key, getContentUrl(), storage, bucketName);
     }
 
     @Override
@@ -44,15 +44,15 @@ public class S3ContentWriter extends AbstractContentWriter {
         try
         {
             String uuid = GUID.generate();
-            logger.debug("S3ContentWriter Creating Temp File: uuid="+uuid);
+            logger.debug("GSContentWriter Creating Temp File: uuid="+uuid);
             tempFile = TempFileProvider.createTempFile(uuid, ".bin");
             OutputStream os = new FileOutputStream(tempFile);
-            logger.debug("S3ContentWriter Returning Channel to Temp File: uuid="+uuid);
+            logger.debug("GSContentWriter Returning Channel to Temp File: uuid="+uuid);
             return Channels.newChannel(os);
         }
         catch (Throwable e)
         {
-            throw new ContentIOException("S3ContentWriter.getDirectWritableChannel(): Failed to open channel. " + this, e);
+            throw new ContentIOException("GSContentWriter.getDirectWritableChannel(): Failed to open channel. " + this, e);
         }
 
     }

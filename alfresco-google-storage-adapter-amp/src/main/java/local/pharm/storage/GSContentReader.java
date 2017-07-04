@@ -15,9 +15,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 
-public class S3ContentReader extends AbstractContentReader {
+public class GSContentReader extends AbstractContentReader {
 
-    private static final Log logger = LogFactory.getLog(S3ContentReader.class);
+    private static final Log logger = LogFactory.getLog(GSContentReader.class);
 
     private String key;
     private Storage storage;
@@ -30,7 +30,7 @@ public class S3ContentReader extends AbstractContentReader {
      * @param contentUrl the content URL - this should be relative to the root of the store
      * @param bucketName
      */
-    protected S3ContentReader(String key, String contentUrl, Storage storage, String bucketName) {
+    protected GSContentReader(String key, String contentUrl, Storage storage, String bucketName) {
         super(contentUrl);
         this.key = key;
         this.storage = storage;
@@ -43,7 +43,7 @@ public class S3ContentReader extends AbstractContentReader {
     protected ContentReader createReader() throws ContentIOException {
 
         logger.debug("Called createReader for contentUrl -> " + getContentUrl() + ", Key: " + key);
-        return new S3ContentReader(key, getContentUrl(), storage, bucketName);
+        return new GSContentReader(key, getContentUrl(), storage, bucketName);
     }
 
     @Override

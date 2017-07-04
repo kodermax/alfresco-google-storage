@@ -1,7 +1,5 @@
 package local.pharm.storage;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.transfer.TransferManager;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -34,20 +32,16 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 
 
-public class S3ContentStore extends AbstractContentStore
+public class GSContentStore extends AbstractContentStore
         implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
 
-    private static final Log logger = LogFactory.getLog(S3ContentStore.class);
+    private static final Log logger = LogFactory.getLog(GSContentStore.class);
     private ApplicationContext applicationContext;
-
-    private AmazonS3 s3Client;
 
     private Storage storage;
     private String accessKey;
     private String projectId;
-    private String secretKey;
     private String bucketName;
-    private String regionName;
     private String rootDirectory;
 
     @Override
@@ -59,13 +53,13 @@ public class S3ContentStore extends AbstractContentStore
     public ContentReader getReader(String contentUrl) {
 
         String key = makeS3Key(contentUrl);
-        return new S3ContentReader(key, contentUrl, s3Client, bucketName);
+        return new GSContentReader(key, contentUrl, storage, bucketName);
 
     }
 
     public void init() {
         if(StringUtils.isNotBlank(this.accessKey)) {
-            logger.debug("Found credentials in properties file");
+            logger.debug("Found credentials in properties file: " + accessKey);
             byte[] decoded = Base64.decode(accessKey);
             ByteArrayInputStream bis = new ByteArrayInputStream(decoded);
             try {
@@ -89,19 +83,9 @@ public class S3ContentStore extends AbstractContentStore
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
-
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
-
-    public void setRegionName(String regionName) {
-        this.regionName = regionName;
-    }
-
     public void setRootDirectory(String rootDirectory) {
 
         String dir = rootDirectory;
@@ -129,7 +113,7 @@ public class S3ContentStore extends AbstractContentStore
 
         String key = makeS3Key(contentUrl);
 
-        return new S3ContentWriter(bucketName, key, contentUrl, existingContentReader, s3Client);
+        return new GSContentWriter(bucketName, key, contentUrl, existingContentReader, storage);
 
     }
 
@@ -177,7 +161,7 @@ public class S3ContentStore extends AbstractContentStore
         try {
             String key = makeS3Key(contentUrl);
             logger.debug("Deleting object from S3 with url: " + contentUrl + ", key: " + key);
-            s3Client.deleteObject(bucketName, key);
+            storage.delete(key);
             return true;
         } catch (Exception e) {
             logger.error("Error deleting S3 Object", e);
